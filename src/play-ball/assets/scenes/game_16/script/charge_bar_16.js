@@ -50,8 +50,12 @@ cc.Class({
         //rectangle的高度与原高度之比小于该值，则取消发射小球
         this.cancelRatio = 0.2;
 
+        //鼠标事件的顺序 
+        this.canLaunch = 0;
+
         this.Canvas.on(cc.Node.EventType.TOUCH_START, e => {
-            if(com.mouse === 1) {
+            if(com.mouse === 1 && this.canLaunch === 0) {
+                this.canLaunch = 1;
                 this.ballRigidBody.linearVelocity = this.ballRigidBody.linearVelocity.normalize().mulSelf(5);
                 this.ballRigidBody.gravityScale = 0.1;
                 this.border.opacity = 255;
@@ -61,17 +65,21 @@ cc.Class({
         });
 
         this.Canvas.on(cc.Node.EventType.TOUCH_MOVE, e => {
-            if(com.mouse === 1) {
+            if(com.mouse === 1 && this.border.opacity === 255) {
                 this.calculateChargeBar(e);
                 this.chargeBarChange();
             }
         });
 
         this.Canvas.on(cc.Node.EventType.TOUCH_END, e => {
-            if(com.mouse === 1) {
+            if(com.mouse === 1 && this.canLaunch === 1) {
+                this.canLaunch = 2;
                 this.ballRigidBody.gravityScale = 1;
                 this.border.opacity = 0;
                 this.launch();
+                setTimeout(() => {
+                    this.canLaunch = 0;
+                }, 2000);
             }
         })
     },
